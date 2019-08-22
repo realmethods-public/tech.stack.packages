@@ -1,0 +1,18 @@
+image: maven:3.3.9
+pipelines:
+  default:
+  - step:
+      name: build, test and package
+      script:
+          - export DEFAULT_HOST_ADDRESS=127.0.0.1
+          - export DEFAULT_HOST_PORT=27017
+          - mvn package
+      caches:
+          - maven
+      services:
+          - mongo
+          
+definitions:
+  services:
+    mongo:
+      image: mongo

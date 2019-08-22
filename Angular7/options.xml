@@ -1,0 +1,63 @@
+<!--
+  realMethods Confidential
+  
+  2019 realMethods, Inc.
+  All Rights Reserved.
+  
+  This file is subject to the terms and conditions defined in
+  file 'license.txt', which is part of this source code package.
+   
+  Contributors :
+        realMethods Inc - General Release
+-->
+<options name="application">
+	<option name="name" value="demo" required="true" 
+		description="app display name" type="input"/>
+	<option name="description" value="" required="false"
+		description="app description" type="input"/>
+	<option name="author" value="" required="false"
+		description="app's author" type="input"/>
+	<option name="email" value="" required="false"
+		description="email address" type="input"/>
+	<option value="" required="" name="corporate logo URL"
+		description="link to company logo" type="input"/>
+	<option value="./img/turnstone.biologics.png" required="false" name="application logo URL"
+		description="link to app logo" type="input"/>
+	<option value="Turnstone Biologics" required="false" modifiable="false" name="company name"
+		description="your company name" type="input"/>
+	<option value="0.0.1" required="true" name="version"
+		description="app version" type="input"/>		
+	<option name="hostUrl" value="http://localhost:4200" modifiable="true" required="true"
+		description="Angular Host Url" type="input"/>	
+	<option name="cicd_platform" value="codeship" 
+		selections="jenkins,codeship,circleci,travis,aws,azure,bitbucket,gitlab,semaphore,shippable,buddy"
+		required="true"
+		description="CI/CD Platform" 
+		type="select"/>	
+	<option name="AES key" value="" modifiable="true" required="true"
+		description="CodeShip AES key value" type="input"/>	
+</options>
+<options name="nexus">
+	<option name="inUse"  value="false" required="true" description="using sonatype nexus" type="boolean"/>
+	<option name="userName"  value="" required="true" description="nexus user name" type="input"/>
+	<option name="password"  value="" required="true" description="nexus password" type="input"/>
+	<option name="email"  value="" required="true" description="email address assigned with nexus"
+		placeHolder="email address asigned to nexus account" type="input"/>
+	<option name="repoUrl" value="http://127.0.0.1/repository/npm-repo" 
+		required="true" description="nexus server url" type="input"/>
+</options>
+<options name="terraform">
+	<option name="inUse"  value="true" required="true" description="using hashicorp terraform" type="boolean"/>
+	<option name="provider" value="aws" required="true" description="provider" type="input"/>
+	<option name="region" value="us-east-1" required="false" description="aws region" type="input"/>
+	<option name="ssh-fingerprint" value="" required="false" description="SSH fingerpint" type="input"/>
+	<option name="aws-vpc" value="vpc-c422e2a0" required="false" description="AWS VPC" type="input"/>
+	<option name="aws-ec2-instance-type" value="t2.medium" required="false" description="AWS EC2 instance type" type="input"/>
+	<option name="aws-access-key" value="AKIAIBOKAPO6BKJVJNHQ" required="false" description="AWS access key" type="input"/>
+	<option name="aws-secret-key" value="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" required="false" description="AWS secret key" type="input"/>
+	<option name="docker-username" value="tylertravismya" required="false" description="Docker user name" type="input"/>
+	<option name="docker-password" value="69cutlass" required="false" description="Docker password" type="input"/>
+	<option name="docker-org-name" value="realmethods" required="false" description="Docker organization name" type="input"/>
+	<option name="docker-repo" value="angular7demo" required="false" description="Docker repo name" type="input"/>
+	<option name="docker-tag" value="latest" required="false" description="Docker tag" type="input"/>
+</options>

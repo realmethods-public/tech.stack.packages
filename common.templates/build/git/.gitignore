@@ -1,0 +1,10 @@
+code_gen_catch_all/
+target/
+.git/
+#set( $cicd = ${aib.getParam( "application.cicd_platform" )} )							      
+#if ( $cicd == "codeship" )
+codeship.aes
+docker.decrypted
+aws.env.decrypted
+Dockerfile
+#end##if ( $cicd == "codeship" )

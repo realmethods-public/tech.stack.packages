@@ -1,0 +1,25 @@
+language: java
+
+git:
+  depth: false
+  quiet: true
+
+env:
+  - DATABASE_USERNAME=root DATABASE_PASSWORD= DATABASE_DIALECT=org.hibernate.dialect.MySQL5Dialect
+
+before_install:
+- echo -e "machine github.com\n  login $GITHUB_TOKEN" > ~/.netrc
+- git lfs pull
+  
+script:
+#if ( ${aib.getParam('nexus.inUse')} == "true" )
+#set( $nexusUserName = ${aib.getParam('nexus.userName')} )
+#set( $nexusPassword = ${aib.getParam('nexus.password')} )
+#set( $nexusRepoUrl = ${aib.getParam('nexus.repoUrl')} )
+- bundle exec mvn deploy --settings settings.xml -Dinternal.repo.username=${nexusUserName} -Dinternal.repo.password=${nexusPassword} -Dinternal.repo.url=${nexusRepoUrl}
+#else        
+- bundle exec mvn package 
+#end    
+  
+services:
+  - mysql

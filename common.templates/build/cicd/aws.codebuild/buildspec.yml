@@ -1,0 +1,43 @@
+version: 0.2
+
+env:
+  variables:
+    JAVA_HOME: "/usr/lib/jvm/java-8-openjdk-amd64"
+    DATABASE_USERNAME: "root"
+    DATABASE_PASSWORD: ""
+    DATABASE_DIALECT: "org.hibernate.dialect.MySQL5Dialect"
+
+phases:
+  install:
+    commands:
+      - echo Entered the install phase...
+      - apt-get update -y
+      - echo Installing Apache Maven...      
+      - apt-get install -y maven
+      - echo Installing MySQL...      
+      - apt-get install -y mysql-server
+      - su mysql -s /bin/bash -c "/usr/sbin/mysqld" &
+      - su mysql "CREATE USER root@localhost IDENTIFIED BY ''; GRANT ALL ON *.* TO root@localhost; FLUSH PRIVILEGES;" &
+    finally:
+      - echo Install phase complete...
+  build:
+    commands:
+#if ( ${aib.getParam('nexus.inUse')} == "true" )
+#set( $nexusUserName = ${aib.getParam('nexus.userName')} )
+#set( $nexusPassword = ${aib.getParam('nexus.password')} )
+#set( $nexusRepoUrl = ${aib.getParam('nexus.repoUrl')} )
+      - echo Entered the build/test/package/deploy phase...
+      - mvn deploy --settings settings.xml -Dinternal.repo.username=${nexusUserName} -Dinternal.repo.password=${nexusPassword} -Dinternal.repo.url=${nexusRepoUrl}
+#else        
+      - echo Entered the build/test/package phase...
+      - mvn package
+#end    
+    finally:
+      - echo Build phase complete
+artifacts:
+  files:
+    - target/*jar
+  discard-paths: yes
+  cache:
+    paths:
+      - '/root/.m2/**/*'

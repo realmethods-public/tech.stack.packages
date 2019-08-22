@@ -1,0 +1,51 @@
+<!--
+  realMethods Confidential
+  
+  2019 realMethods, Inc.
+  All Rights Reserved.
+  
+  This file is subject to the terms and conditions defined in
+  file 'license.txt', which is part of this source code package.
+   
+  Contributors :
+        realMethods Inc - General Release
+-->
+<options name="application">
+	<option name="name" value="demo" required="true" 
+		description="app display name" type="input"/>
+	<option name="description" value="" required="false"
+		description="app description" type="input"/>
+	<option name="author" value="" required="false"
+		description="app's author" type="input"/>
+	<option value="" required="" name="corporate logo URL"
+		description="link to company logo" type="input"/>
+	<option value="./img/turnstone.biologics.png" required="false" name="application logo URL"
+		description="link to app logo" type="input"/>
+	<option value="Turnstone Biologics" required="false" modifiable="false" name="company name"
+		description="your company name" type="input"/>
+	<option value="0.0.1" required="true" name="version"
+		description="app version" type="input"/>		
+	<option name="hostUrl" value="http://localhost:4200" modifiable="true" required="true"
+		description="Angular Host Url" type="input"/>
+</options>
+<options name="nexus">
+	<option name="inUse"  value="false" required="true" description="using sonatype nexus" type="boolean"/>
+	<option name="userName"  value="" required="true" description="nexus user name" type="input"/>
+	<option name="password"  value="" required="true" description="nexus password" type="input"/>
+	<option name="email"  value="" required="true" description="email address assigned with nexus"
+		placeHolder="email address asigned to nexus account" type="input"/>
+	<option name="repoUrl" value="http://127.0.0.1/repository/npm-repo" 
+		required="true" description="nexus server url" type="input"/>
+</options>
+<options name="jfrog">
+	<option name="inUse"  value="false" required="true" description="using jFrog" type="boolean"/>
+	<option name="userName"  value="" required="true" description="jfrog user name" type="input"/>
+	<option name="password"  value="" required="true" description="jFrog password" type="input"/>
+	<option name="email"  value="" required="true" description="email address assigned with jFrog"
+		placeHolder="email address asigned to jfrog account" type="input"/>
+	<option name="serverUrl" value="http://localhost:8081/artifactory" 
+		required="true" description="jFrog Artifactory Server Url" type="input"/>
+	<option name="publishRepoKey" value="" placeHolder="local-npm-repo" required="true" description="target an existing NPM repository" type="input"/>
+ 	<option name="pluginRepoKey" value="" placeHolder="remote-npm-repo" required="true" description="target an existing remote NPM repository" type="input"/>
+	<option name="snapshotRepoKey" value="" placeHolder="libs-snapshot-local" required="true" description="target an existing snapshot NPM repository" type="input"/>
+</options>

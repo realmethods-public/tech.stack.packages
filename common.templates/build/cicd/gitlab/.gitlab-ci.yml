@@ -1,0 +1,41 @@
+image: java:8
+image: maven:latest
+
+services:
+- mysql:8.0
+
+variables:
+  DATABASE_USERNAME: "root"
+  DATABASE_PASSWORD: ""
+  DATABASE_DIALECT: "org.hibernate.dialect.MySQL8Dialect"
+  DATABASE_DRIVER: "com.mysql.cj.jdbc.Driver"
+  DATABASE_URL: "jdbc:mysql://mysql:3306/gitlabtest?createDatabaseIfNotExist=true"
+  DATABASE_NAME: "gitlabtest"
+  MYSQL_ROOT_PASSWORD: ""
+  MYSQL_ALLOW_EMPTY_PASSWORD: "true"
+  
+cache:
+  paths:
+    - .m2/repository/
+    - target/
+
+stages:
+  - build
+
+build:
+  stage: build
+  script:
+#if ( ${aib.getParam('nexus.inUse')} == "true" )
+#set( $nexusUserName = ${aib.getParam('nexus.userName')} )
+#set( $nexusPassword = ${aib.getParam('nexus.password')} )
+#set( $nexusRepoUrl = ${aib.getParam('nexus.repoUrl')} )
+    - mvn deploy --settings settings.xml -Dinternal.repo.username=${nexusUserName} -Dinternal.repo.password=${nexusPassword} -Dinternal.repo.url=${nexusRepoUrl}
+#else        
+    - mvn package
+#end    
+  artifacts:
+    reports:
+      junit:
+        - target/surefire-reports/TEST-*.xml
+        - target/failsafe-reports/TEST-*.xml    
+      

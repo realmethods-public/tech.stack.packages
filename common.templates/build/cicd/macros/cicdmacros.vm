@@ -1,0 +1,56 @@
+#macro( determineCICDPlatform )
+#set( $cicd = ${aib.getParam( "application.cicd_platform" )} )
+#if ( $cicd == $null || $cicd == "" ) 
+Jenkinsfile=
+azure-pipelines.yml=
+buildspec.yml=
+buddy.yml=
+shippable.yml=
+.travis.yml=
+config.yml=..circleci
+.gitlab-ci.yml=
+semaphore.yml=..semaphore
+#else
+#if ( $cicd == "jenkins" )
+Jenkinsfile=
+#elseif ( $cicd == "codeship" )
+codeship-services.yml
+codeship-steps.yml=
+Dockerfile_For_Setup=
+Dockerfile_For_CodeShip=
+Dockerfile_For_Terraform=
+projectbuild.sh=
+terraform.sh=
+codeship.aes=
+docker.decrypted=
+aws.env.decrypted=
+empty.tmp.code.file=.tmp.code
+empty.code.file=.code
+#elseif ( $cicd == "azure" )
+azure-pipelines.yml=
+#elseif ( $cicd == "aws" )
+buildspec.yml=
+#elseif ( $cicd == "buddy" )
+buddy.yml=
+#elseif ( $cicd == "shippable" )
+shippable.yml=
+#elseif ( $cicd == "travis" )
+.travis.yml=
+#elseif ( $cicd == "circleci" )
+config.yml=..circleci
+#elseif ( $cicd == "bitbucket" )
+bitbucket-pipelines.yml=
+#elseif ( $cicd == "gitlab" )
+.gitlab-ci.yml=
+#elseif ( $cicd == "semaphore" )
+semaphore.yml=..semaphore
+#end##if ( $cicd == "jenkins" )
+#end##if ( $cicd == $null || $cicd == "" )
+#end##macro( determineCICDPlatform )
+
+#macro( determineTerraform )
+#if ( $aib.getParam("terraform.inUse") == "true" )
+*.tf=terraform
+terraform.tfvrs=terraform
+#end##if ( $aib.getParam("terraform.inUse") == "true" )
+#end##macro( determineTerraform )

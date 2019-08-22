@@ -1,0 +1,132 @@
+########################################################################
+## terraform job declaration macro
+########################################################################
+#macro( terraformJobDeclaration )
+#if( ${aib.getParam("terraform.inUse")} == "true" )
+      - docker_build:
+          requires:
+            - build_test_project
+      - terraform:
+          requires:
+            - docker_build
+#end
+#end##macro( terraformJobDeclaration )
+
+########################################################################
+## terraform references macro
+########################################################################
+#macro( terraformReferences )
+#if( ${aib.getParam("terraform.inUse")} == "true" )      
+  
+base_terraform_image: &base_terraform_image
+  hashicorp/terraform:0.11.14
+  
+terraform_config: &terraform_config
+  docker:
+    - image: *base_terraform_image
+      environment:
+          TERRAFORM_DIR: terraform
+  working_directory: *working_directory
+  environment:
+    BASH_ENV: /root/.bashrc
+
+terraform_init: &terraform_init
+  run:
+    name: terraform init
+    command: |
+      cd /home/circleci/gitRoot/terraform
+      terraform init
+#end
+#end##macro( terraformReferenceDeclaration )
+
+########################################################################
+## terraform job definition macro
+########################################################################
+#macro( terraformJobDefinition )
+#set( $fingerprint = ${aib.getParam("terraform.ssh-fingerprint")} )
+  terraform:
+    <<: *terraform_config
+    steps:
+      - *restore_repo
+      - *terraform_init
+      - add_ssh_keys: # fingerprint is returned when the private SSH key is applied to this CircleCI project
+          fingerprints:
+            - "${fingerprint}"
+      - run:
+          name: terraform plan
+          command: |
+            cd /home/circleci/gitRoot/terraform
+            terraform plan -out=terraform.plan -var aws-access-key=$USER_AWS_ACCESSKEY -var aws-secret-key=$USER_AWS_SECRETKEY
+            terraform apply -auto-approve "terraform.plan"
+#end##macro( terraformJobDefinition )
+
+########################################################################
+## aws key pair declaration components to dynamically create SSH access
+########################################################################
+#macro ( outputAWSKeyPairDecl )
+locals {
+  public_key_filename  = "${path.root}/keys/id_rsa.pub"
+  private_key_filename = "${path.root}/keys/id_rsa"
+}
+
+# Generate an RSA key to be used
+resource "tls_private_key" "generated" {
+  algorithm = "RSA"
+}
+
+# Generate the local SSH Key pair in the directory specified
+resource "local_file" "public_key_openssh" {
+  content  = "${tls_private_key.generated.public_key_openssh}"
+  filename = "${local.public_key_filename}"
+}
+resource "local_file" "private_key_pem" {
+  content  = "${tls_private_key.generated.private_key_pem}"
+  filename = "${local.private_key_filename}"
+}
+
+resource "aws_key_pair" "generated" {
+  key_name   = "pjsk-sshtest-${esc.dollar}{uuid()}"
+  public_key = "${tls_private_key.generated.public_key_openssh}"
+
+  lifecycle {
+    ignore_changes = ["key_name"]
+  }
+}
+#end ##macro ( outputAWSKeyPairDecl )
+
+########################################################################
+## expression to use to ssh into the created AWS EC2 instance
+########################################################################
+#macro ( outputSSHCommandDecl )
+output "ssh_command" {
+  description = "Command to use to SSH into the instance."
+  value = "ssh -i ${local.private_key_filename} ubuntu@${aws_instance.web.public_ip}"
+}
+#end ##macro ( outputSSHCommandDecl )
+
+########################################################################
+## determiner for which terraform file to use
+########################################################################
+#macro( determineDeploymentPlan )
+#if ( $aib.getParam( "kubernetes.inUse" ) == "true" )
+account.json=terraform
+k8s.tf=terraform.k8s
+pods.tf=terraform.k8s
+services.tf=terraform.k8s
+k8s.variables.tf=terraform.k8s
+#if ( $aib.getParam( "kubernetes.hostTarget" ) == "google" )
+k8.google.main.tf=terraform
+gcp.cluster.tf=terraform.gke
+gcp.tf=terraform.gke
+gcp.variables.tf=terraform.gke
+#elseif ( $aib.getParam( "kubernetes.hostTarget" ) == "aws" )
+k8.aws.main.tf=terraform
+aws.cluster.tf=terraform.eks
+aws.tf=terraform.eks
+aws.variables.tf=terraform.eks
+#end ##if ( $aib.getParam( "kubernetes.hostTarget" ) == "google" )
+#else
+main.tf=terraform
+variables.tf=terraform
+#end ##if ( $aib.getParam( "kubernetes.inUse" ) == "true" )
+#end ##macro( determineDeploymentPlan )

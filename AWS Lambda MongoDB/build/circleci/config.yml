@@ -1,0 +1,89 @@
+#if( ${containerObject} )
+#set( $appName = "Container-${containerObject.getName()}" )
+#else
+#set( $appName = $aib.getApplicationNameFormatted() )
+#end
+#set( $workingDir = $appName )
+version: 2
+
+references:
+#cacheReferences()
+#terraformReferences()
+
+jobs: 
+
+  # core job to build and test the project
+  build_test_project:
+
+    # assign the working directory
+    working_directory: *working_directory
+
+    # run the steps with Docker as the primary container
+    # job commands run in this container
+    # CircleCI Java8 image, installs Apache Maven
+    # mongo:4.0.5, run in a common network where ports exposed on 
+    #      the primary container are available on localhost.
+    docker:
+      - image: circleci/openjdk:8-jdk-browsers
+      - image: mongo:4.0.5
+        command: [mongod, --smallfiles]
+
+    # steps that comprise the `build_test_deploy` job
+    steps:
+
+      # check out source code to working directory
+      - checkout
+
+      # Restore any previous cache
+      # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
+      - *restore_repo
+
+      # user maven to first package then deploy the generated
+      # Lambda functions.  The key vars (USER_AWS_ACCESSKEY and USER_AWS_SECRETKEY) are
+      # read in as env vars for the current project.
+      # Learn how to add these env vars at https://circleci.com/docs/2.0/env-vars/#setting-an-environment-variable-in-a-project
+#if( ${aib.getParam("terraform.inUse")} == "true" )
+      - run: 
+          name: Package application
+          command: mvn package
+#else
+      - run: 
+          name: Deploy AWS Lambda functions
+          command: mvn package lambda:delete-lambda lambda:deploy-lambda -DAWS_ACCESSKEY=$USER_AWS_ACCESSKEY -DAWS_SECRETKEY=$USER_AWS_SECRETKEY
+#end##if( ${aib.getParam("terraform.inUse")} == "true" )
+
+     # cache Maven dependencies using checksum of pom.xml as the cache-key
+      - *save_repo
+
+      # save the results from the testing that occurred during
+      # the maven packaging in the prior step
+      - run:
+          name: Save test results
+          command: |
+            mkdir -p ~/test-results/junit/
+            find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} ~/test-results/junit/ \;
+          when: always
+
+      # Upload test results for display in Test Summary:
+      # https://circleci.com/docs/2.0/collect-test-data/
+      - store_test_results:
+          path: ~/test-results
+
+      # Upload test summary for display in Artifacts:
+      # https://circleci.com/docs/2.0/artifacts/
+      - store_artifacts:
+          path: ~/test-results/junit
+
+#terraformJobDefinition()
+
+#  workflow to execute the build_test, docker_build, and terraform jobs
+
+workflows:
+  version: 2
+  build_test_deploy_workflow:
+    jobs:
+      - build_test_project
+      - terraform:
+          requires:
+            - build_test_project
+            

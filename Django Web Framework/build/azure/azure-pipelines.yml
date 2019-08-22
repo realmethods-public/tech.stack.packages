@@ -1,0 +1,38 @@
+#if( ${containerObject} )
+#set( $appName = "Container-${containerObject.getName()}" )
+#else
+#set( $appName = $aib.getApplicationNameFormatted() )
+#end
+pool:
+  vmImage: 'ubuntu-16.04'
+
+variables: # pipeline-level
+  PIPENV_VENV_IN_PROJECT: 'true'
+
+steps:
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: '3.6'
+    architecture: 'x64'
+    
+- script: pip install --upgrade pip
+  displayName: 'installing pip upgrade'
+  
+- script: pip install pipenv
+  displayName: 'installing pipenv'
+  
+- script: pipenv install
+  displayName: 'installing project dependencies'
+  
+- script: pipenv install Django==2.0
+  displayName: 'installing django 2.0'
+  
+- script: pipenv install pytest-django
+  displayName: 'installing pytest-django'
+  
+- script: pipenv run pytest --junitxml=test-results/junit.xml ${appName}/tests
+  displayName: 'running pytest over test cases, storing test results'
+  
+- script: python ${appName}/setup.py sdist
+  displayName: 'packaging distribution'
+ 
