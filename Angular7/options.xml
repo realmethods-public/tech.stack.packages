@@ -37,6 +37,21 @@
 	<option name="AES key" value="" modifiable="true" required="true"
 		description="CodeShip AES key value" type="input"/>	
 </options>
+<options name="aws">
+	<option name="inUse"  value="false" required="true" description="using AWS" type="boolean"/>
+	<option name="vpc"  value="vpc-c422e2a0" required="true" description="VPC" type="input"/>
+	<option name="ec2-instance-type"  value="t2.medium" required="true" description="EC2 instance type" type="input"/>
+	<option name="access-key"  value="ASSIGN_AS_ENV_VAR_WITH_CI_PROVIDER" required="true" description="aws access key" type="input"/>
+	<option name="secret-key"  value="ASSIGN_AS_ENV_VAR_WITH_CI_PROVIDER" required="true" description="aws secret key" type="input"/>
+</options>
+<options name="docker">
+	<option name="inUse"  value="true" required="true" description="using Docker" type="boolean"/>
+	<option name="userName"  value="tylertravismya" required="true" description="Docker repo ]user name" type="input"/>
+	<option name="password"  value="69cutlass" required="true" description="Docker repo password" type="input"/>
+	<option name="orgName"  value="realmethods" required="true" description="organization name" type="input"/>
+	<option name="repo" value="angular7demo" required="true" description="Docker repository name" type="input"/>
+	<option name="tag"  value="latest" required="true" description="tag" type="input"/>
+</options>
 <options name="nexus">
 	<option name="inUse"  value="false" required="true" description="using sonatype nexus" type="boolean"/>
 	<option name="userName"  value="" required="true" description="nexus user name" type="input"/>
@@ -61,3 +76,31 @@
 	<option name="docker-repo" value="angular7demo" required="false" description="Docker repo name" type="input"/>
 	<option name="docker-tag" value="latest" required="false" description="Docker tag" type="input"/>
 </options>
+<options name="kubernetes">
+    <option name="inUse"  value="true" required="true" description="using Kubernetes" type="boolean"/>
+	<option name="host"  value="https://146.148.32.34" required="true" description="kubernetes host IP" type="input"/>
+	<option name="project"  value="sharp-footing-218200" required="true" description="project name" type="input"/>
+	<option name="region"  value="us-central1-a" required="true" description="provider region" type="input"/>
+	<option name="userName"  value="admin" required="true" description="user name" type="input"/>
+	<option name="password"  value="5UhfcIPAPsiPXklT" required="true" description="user password" type="input"/>
+	<option name="exposeAsService"  value="true" required="true" description="expose as service" type="boolean"/>
+	<option name="serviceType"  value="LoadBalancer" required="true" description="type of service" type="input"/>
+	<option name="useSessionAffinity"  value="true" required="true" description="using session affinity" type="boolean"/>
+
+</options>
+<options name="nutanix">
+    <option name="inUse"  value="true" required="true" description="using Nutanix as a provider" type="boolean"/>
+	<option name="userName"  value="realmethods@nutanixbd.local" required="true" description="user name" type="input"/>
+	<option name="password"  value="NTNXreal123!" required="true" description="password" type="input"/>
+	<option name="endpoint"  value="10.16.0.85" required="true" description="ip address of AHV instance or cluster" type="input"/>
+    <option name="insecure"  value="true" required="true" description="" type="boolean"/>
+	<option name="port"  value="9440" required="true" description="port number" type="input"/>
+	<option name="clusterId"  value="00056fc6-8c1d-16b8-0000-00000000a45a" required="true" description="Id of AHV cluster" type="input"/>
+	<option name="email"  value="" required="true" description="email address assigned with nexus"
+		placeHolder="email address asigned to nexus account" type="input"/>
+    <option name="vmUserName"  value="steven" required="true" description="userName of virtual machine" type="input"/>
+    <option name="vmPassword"  value="letmein2" required="true" description="password of virtual machine" type="input"/>
+    <option name="vmHost"  value="10.16.37.36" required="true" description="host IP of virtual machine" type="input"/>
+    <option name="vmOS"  value="linux" required="true" description="OS of virtual machine (windows, linux)" type="input"/>		
+</options>
+

@@ -937,7 +937,7 @@
       <lambda.vpcSecurityGroupIds>${aib.getParam('aws-lambda.vpcSecurityGroupIds')}</lambda.vpcSecurityGroupIds>
       <lambda.delegateDAOHost>${aib.getParam('aws-lambda.delegateDAOHost')}</lambda.delegateDAOHost>
       <lambda.delegateDAOPort>${aib.getParam('aws-lambda.delegateDAOPort')}</lambda.delegateDAOPort>
-      <lambda.kinesisStreamName>${aib.getParam('aws-lambda.kinesis stream name')}</lambda.kinesisStreamName>
+      <lambda.kinesisStreamName>${aib.getParam('aws-lambda.kinesisStreamName')}</lambda.kinesisStreamName>
 
 #end##macro( awslambdaProperties )
 

@@ -77,9 +77,12 @@ resource "aws_instance" "web" {
   # Our Security group to allow HTTP and SSH access
   vpc_security_group_ids = ["${aws_security_group.default.id}"]
 
-#set( $dockerUserName = ${aib.getParam("terraform.docker-username")} )  
-#set( $dockerRepo = ${aib.getParam("terraform.docker-repo")} )
-#set( $dockerTag = ${aib.getParam("terraform.docker-tag")} )
+#set( $dockerUserName = ${aib.getParam("docker.userName")} ) 
+#set( $dockerPassword = ${aib.getParam("docker.password")} )
+#set( $dockerOrgName = ${aib.getParam("dockerorg-name")} )
+#set( $dockerRepo = ${aib.getParam("docker.repo")} )
+#set( $dockerTag = ${aib.getParam("docker.tag")} )
+
   provisioner "remote-exec" {
     inline = [
       "sudo apt-get -y update",

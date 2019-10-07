@@ -1,12 +1,13 @@
+########################################################################
+## AWS Provider Terraform expressions
+########################################################################
+#macro( outputAsAWSProvider )
 #if( ${containerObject} )
 #set( $appName = "Container-${containerObject.getName()}" )
 #else
 #set( $appName = $aib.getApplicationNameFormatted() )
 #end
 
-#if( ${aib.getParam("terraform.provider")} == "aws" )
-
-#set( $dbEngine = ${aib.getParam("terraform.db-engine")} )
 # Specify the provider and access details
 provider "aws" {
   region     = "${aib.getParam("terraform.region")}"
@@ -43,29 +44,19 @@ resource "aws_security_group" "web" {
 
   # HTTP access from the VPC
   ingress {
-    from_port   = 8080
-    to_port     = 8080
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  # HTTP access from the VPC
-  ingress {
     from_port   = 8000
     to_port     = 8000
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  # mongoose access from anywhere
+  # HTTP access from the VPC
   ingress {
-    from_port   = 4000
-    to_port     = 4000
+    from_port   = 8080
+    to_port     = 8080
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-  
-
   # outbound internet access
   egress {
     from_port   = 0
@@ -76,22 +67,14 @@ resource "aws_security_group" "web" {
 }
 
 # Our default security group to for the database
-resource "aws_security_group" "mongo" {
-  description = "security group created from terraform"
-  vpc_id      = "vpc-c422e2a0"
+resource "aws_security_group" "rds" {
+  description = "security group for ${appName} RDS created from terraform"
+  vpc_id      = "${aws-vpc}"
 
-  # SSH access from anywhere
+  # mysql access from anywhere
   ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  
-  # mongodb access from anywhere
-  ingress {
-    from_port   = 27017
-    to_port     = 27017
+    from_port   = 3306
+    to_port     = 3306
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -105,40 +88,19 @@ resource "aws_security_group" "mongo" {
   }
 }
 
-resource "aws_instance" "mongodb" {
-  # The connection block tells our provisioner how to
-  # communicate with the resource (instance)
-  connection {
-    # The default username for our AMI
-    user = "ubuntu"
-    private_key = "${tls_private_key.generated.private_key_pem}"
-  }
-
-  instance_type = "t2.micro"
-  
-  tags = { Name = "mongodb instance" } 
-
-  # standard realmethods community image with mongo started on the default port 
-  ami = "ami-0e2a167cf2e0ce6c0"
-
-  # The name of the  SSH keypair you've created and downloaded
-  # from the AWS console.
-  #
-  # https://console.aws.amazon.com/ec2/v2/home?region=us-west-2#KeyPairs:
-  #
-  # key_name = "${aib.getParam("terraform.aws-key-pair-name")}"
-  key_name = "${aws_key_pair.generated.key_name}"
-  
-  # Our Security group to allow HTTP and SSH access
-  vpc_security_group_ids = ["${aws_security_group.mongo.id}"]
-  
-  # To ensure ssh access works
-    provisioner "remote-exec" {
-    inline = [
-      "sudo ls",
-    ]
-  }
-
+#set( $dbEngine = ${aib.getParam("terraform.db-engine")} )
+#set( $dbVersion = ${aib.getParam("terraform.db-version")} )
+resource "aws_db_instance" "default" {
+  depends_on             = ["aws_security_group.rds"]
+#  identifier             = "${appName}-rds" # Terraform will create a unique id if not assigned
+  allocated_storage      = "10"
+  engine                 = "${dbEngine}"
+  engine_version         = "${dbVersion}"
+  instance_class         = "${aib.getParam("terraform.aws-db-instance-type")}"
+  name                   = "${appName}"
+  username               = "${aib.getParam("hibernate.hibernate.connection.username")}"
+  password               = "${aib.getParam("hibernate.hibernate.connection.password")}"
+  vpc_security_group_ids = ["${aws_security_group.rds.id}"]
 }
 
 resource "aws_instance" "web" {
@@ -149,7 +111,7 @@ resource "aws_instance" "web" {
     user = "ubuntu"
     private_key = "${tls_private_key.generated.private_key_pem}"
   }
-  
+
   instance_type = "${aib.getParam("terraform.aws-ec2-instance-type")}"
   
   tags = { Name = "${appName} instance" } 
@@ -161,9 +123,10 @@ resource "aws_instance" "web" {
   # from the AWS console.
   #
   # https://console.aws.amazon.com/ec2/v2/home?region=us-east-1#KeyPairs:
+  #
   # key_name = "${aib.getParam("terraform.aws-key-pair-name")}"
   key_name = "${aws_key_pair.generated.key_name}"
-
+  
   # Our Security group to allow HTTP and SSH access
   vpc_security_group_ids = ["${aws_security_group.web.id}"]
 
@@ -172,24 +135,62 @@ resource "aws_instance" "web" {
 #set( $dockerOrgName = ${aib.getParam("dockerorg-name")} )
 #set( $dockerRepo = ${aib.getParam("docker.repo")} )
 #set( $dockerTag = ${aib.getParam("docker.tag")} )
-#set( $mongoHostAddress = "mongodb://${esc.dollar}{aws_instance.mongodb.public_ip}:27017/${aib.getParam('mongodb.database name')}" )
+#set( $databaseUrl = "jdbc:${dbEngine}://${esc.dollar}{aws_db_instance.default.endpoint}/${appName}" )
   provisioner "remote-exec" {
     inline = [
       "sudo apt-get -y update",
-      "sudo apt-get -y install docker",
       "sudo docker login --username ${dockerUserName} --password ${dockerPassword}",
       "sudo docker pull ${dockerOrgName}/${dockerRepo}:${dockerTag}",
-      "sudo docker run -it -e MONGOOSE_HOST_NAME=${aws_instance.web.public_ip} -e MONGO_HOST_ADDRESS=${mongoHostAddress} -p 4000:4000 -p 8080:8080 -p 8000:8000 ${dockerOrgName}/${dockerRepo}:${dockerTag}"
+      "sudo docker run -it -p 8000:8000 -p 8080:8080 -e DATABASE_URL=${databaseUrl} ${dockerOrgName}/${dockerRepo}:${dockerTag}"
     ]
   }
 }
 
 #outputSSHCommandDecl()
 
-#elseif( ${aib.getParam("terraform.provider")} == "google" )
-#outputAsGoogleProvider()
-#elseif( ${aib.getParam("terraform.provider")} == "azure" )
-#outputAsAzureProvider()
-#elseif( ${aib.getParam("terraform.provider")} == "nutanix" )
-#outputAsNutanixProvider()
-#end##if( ${aib.getParam("terraform.provider")} == "aws" )
+#end
+
+########################################################################
+## aws key pair declaration components to dynamically create SSH access
+########################################################################
+#macro ( outputAWSKeyPairDecl )
+locals {
+  public_key_filename  = "${path.root}/keys/id_rsa.pub"
+  private_key_filename = "${path.root}/keys/id_rsa"
+}
+
+# Generate an RSA key to be used
+resource "tls_private_key" "generated" {
+  algorithm = "RSA"
+}
+
+# Generate the local SSH Key pair in the directory specified
+resource "local_file" "public_key_openssh" {
+  content  = "${tls_private_key.generated.public_key_openssh}"
+  filename = "${local.public_key_filename}"
+}
+resource "local_file" "private_key_pem" {
+  content  = "${tls_private_key.generated.private_key_pem}"
+  filename = "${local.private_key_filename}"
+}
+
+resource "aws_key_pair" "generated" {
+  key_name   = "pjsk-sshtest-${esc.dollar}{uuid()}"
+  public_key = "${tls_private_key.generated.public_key_openssh}"
+
+  lifecycle {
+    ignore_changes = ["key_name"]
+  }
+}
+#end ##macro ( outputAWSKeyPairDecl )
+
+########################################################################
+## expression to use to ssh into the created AWS EC2 instance
+########################################################################
+#macro ( outputSSHCommandDecl )
+output "ssh_command" {
+  description = "Command to use to SSH into the instance."
+  value = "ssh -i ${local.private_key_filename} ubuntu@${aws_instance.web.public_ip}"
+}
+#end ##macro ( outputSSHCommandDecl )
+

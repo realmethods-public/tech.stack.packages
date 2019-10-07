@@ -61,50 +61,6 @@ terraform_init: &terraform_init
 #end##macro( terraformJobDefinition )
 
 ########################################################################
-## aws key pair declaration components to dynamically create SSH access
-########################################################################
-#macro ( outputAWSKeyPairDecl )
-locals {
-  public_key_filename  = "${path.root}/keys/id_rsa.pub"
-  private_key_filename = "${path.root}/keys/id_rsa"
-}
-
-# Generate an RSA key to be used
-resource "tls_private_key" "generated" {
-  algorithm = "RSA"
-}
-
-# Generate the local SSH Key pair in the directory specified
-resource "local_file" "public_key_openssh" {
-  content  = "${tls_private_key.generated.public_key_openssh}"
-  filename = "${local.public_key_filename}"
-}
-resource "local_file" "private_key_pem" {
-  content  = "${tls_private_key.generated.private_key_pem}"
-  filename = "${local.private_key_filename}"
-}
-
-resource "aws_key_pair" "generated" {
-  key_name   = "pjsk-sshtest-${esc.dollar}{uuid()}"
-  public_key = "${tls_private_key.generated.public_key_openssh}"
-
-  lifecycle {
-    ignore_changes = ["key_name"]
-  }
-}
-#end ##macro ( outputAWSKeyPairDecl )
-
-########################################################################
-## expression to use to ssh into the created AWS EC2 instance
-########################################################################
-#macro ( outputSSHCommandDecl )
-output "ssh_command" {
-  description = "Command to use to SSH into the instance."
-  value = "ssh -i ${local.private_key_filename} ubuntu@${aws_instance.web.public_ip}"
-}
-#end ##macro ( outputSSHCommandDecl )
-
-########################################################################
 ## determiner for which terraform file to use
 ########################################################################
 #macro( determineDeploymentPlan )
@@ -124,6 +80,8 @@ k8.aws.main.tf=terraform
 aws.cluster.tf=terraform.eks
 aws.tf=terraform.eks
 aws.variables.tf=terraform.eks
+#elseif ( $aib.getParam( "kubernetes.hostTarget" ) == "nutanix" )
+main.tf=terraform
 #end ##if ( $aib.getParam( "kubernetes.hostTarget" ) == "google" )
 #else
 main.tf=terraform

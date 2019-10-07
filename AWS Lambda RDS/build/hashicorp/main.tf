@@ -121,11 +121,11 @@ resource "aws_instance" "web" {
   # Our Security group to allow HTTP and SSH access
   vpc_security_group_ids = ["${aws_security_group.web.id}"]
 
-#set( $dockerUserName = ${aib.getParam("terraform.docker-username")} ) 
-#set( $dockerPassword = ${aib.getParam("terraform.docker-password")} )
-#set( $dockerOrgName = ${aib.getParam("terraform.docker-org-name")} )
-#set( $dockerRepo = ${aib.getParam("terraform.docker-repo")} )
-#set( $dockerTag = ${aib.getParam("terraform.docker-tag")} )
+#set( $dockerUserName = ${aib.getParam("docker.userName")} ) 
+#set( $dockerPassword = ${aib.getParam("docker.password")} )
+#set( $dockerOrgName = ${aib.getParam("dockerorg-name")} )
+#set( $dockerRepo = ${aib.getParam("docker.repo")} )
+#set( $dockerTag = ${aib.getParam("docker.tag")} )
 #set( $databaseUrl = "jdbc:${dbEngine}://${esc.dollar}{aws_db_instance.default.endpoint}/${appName}" )
   provisioner "remote-exec" {
     inline = [
