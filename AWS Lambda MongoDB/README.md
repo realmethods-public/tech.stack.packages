@@ -31,3 +31,6 @@ to assign environment variables USER_AWS_ACCESSKEY and USER_AWS_SECRETKEY to the
 
 ## External Doc Link
 [http://www.realmethods.com/infopages/angularjs-mongodb-info-page.html](http://www.realmethods.com/infopages/angularjs-mongodb-info-page.html)
+
+## Package Derived From
+None

@@ -31,3 +31,9 @@ To quickly build and execute the application, issue the following from the app r
 `mvn package jetty:run`
 
 Running this way, the application assumes MySQL is running on the localhost @ port 3306.
+
+## External Doc Link
+None
+
+## Package Derived From
+None

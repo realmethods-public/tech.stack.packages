@@ -59,3 +59,6 @@ To start issuing queries using GraphQL, [click here](https://www.apollographql.c
 
 ## External Doc Link
 [http://www.realmethods.com/infopages/apollo-info-page.html](http://www.realmethods.com/infopages/apollo-info-page.html)
+
+## Package Derived From
+None
