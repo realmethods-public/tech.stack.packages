@@ -158,6 +158,7 @@
 #end
 
 #macro( gitExecDecl )
+##set( $basedir = "${project.basedir}")
 <!-- git execution -->
 		     		<execution>
 			        	<id>git</id>
@@ -181,13 +182,16 @@
 									  </exec>
 									</then>
 							      </if>
-#set( $cicd = ${aib.getParam( "application.cicd_platform" )} )							      
+#set( $cicd = ${aib.getParam( "cicd.platform" )} )							      
 #if ( $cicd == "codeship" )
 								  <exec executable="dos2unix" logError="false" failonerror="false" failifexecutionfails="false">
 									<arg value="${basedir}/codeship.aes"/>
 							      </exec>
 								  <exec executable="dos2unix" logError="false" failonerror="false" failifexecutionfails="false">
-									<arg value="${basedir}/decrypted"/>
+									<arg value="${basedir}/docker.decrypted"/>
+							      </exec>							      
+								  <exec executable="dos2unix" logError="false" failonerror="false" failifexecutionfails="false">
+									<arg value="${basedir}/aws.env.decrypted"/>
 							      </exec>							      
    							      <exec executable="jet" logError="false" failonerror="false" failifexecutionfails="false">
 							        <arg value="encrypt"/>
@@ -198,12 +202,12 @@
 							        <arg value="encrypt"/>
 							        <arg value="${basedir}/aws.env.decrypted"/>
 							        <arg value="${basedir}/aws.env.encrypted"/>
-							      </exec>	
-							      	
+							      </exec>								      	
 #end##if ( $cicd == "codeship" )
    							      <exec executable="bash" logError="false" failonerror="false" failifexecutionfails="false">
 							        <arg value="--login"/>
 							        <arg value="${basedir}/gitpush.sh"/>
+									<arg value="${basedir}"/>
 							      </exec>	
 							      
 							  </then>
@@ -242,6 +246,7 @@
 #end##macro( scpToRemoteExecDecl )
 
 #macro( awsLambdaFunctionDecls )
+#if( ${aib.getParam("crudDeclStrategy")} == "methodsPerClass" )
 #set( $size = $aib.getClassesWithIdentity().size() )			
 #foreach( $class in $aib.getClassesWithIdentity() )
 #set( $loopCount = $velocityCount )		
@@ -276,7 +281,13 @@
 #awsLambdaFuncDecl( ${class.getName()} "delete${className}" "delete${className}"  "delete a $className by its primary key", "" )
 #end ##if( $loopCount < $size )
 #end ##foreach( $class in $aib.getClassesWithIdentity() )
-
+#elseif( ${aib.getParam("crudDeclStrategy")} == "uberMethodPerClass" )
+#foreach( $class in $aib.getClassesWithIdentity() )
+#awsLambdaFuncDecl( ${class.getName()} "execute" "execute"  "Uber method to serve as a single entry point for ${class.getName()} CRUD exection", "" )
+#end##foreach( $class in $aib.getClassesWithIdentity() )
+#elseif( ${aib.getParam("crudDeclStrategy")} == "uberMethod" )
+#awsLambdaFuncDecl( "Uber" "execute" "execute"  "Uber method to serve as a single entry point for CRUD exection across all entities", "" )
+#end##if( ${aib.getParam("crudDeclStrategy") == "methodsPerClass" )
 #end##macro( awsLambdaFunctionDecls )
 
 ########################################################################
@@ -946,16 +957,16 @@
       <swagger.plugin.version>3.1.6</swagger.plugin.version>
       <swagger.host>${aib.getParam('swagger.host')}</swagger.host>
       <swagger.basepath>${aib.getParam('swagger.basepath')}</swagger.basepath>
-	  <swagger.contact.email>${aib.getParam('swagger.contact email')}</swagger.contact.email>
-      <swagger.contact.name>${aib.getParam('swagger.contact name')}</swagger.contact.name>
-      <swagger.contact.url>${aib.getParam('swagger.contact url')}</swagger.contact.url>
-	  <swagger.license.url>${aib.getParam('swagger.license url')}</swagger.license.url>
-      <swagger.license.name>${aib.getParam('swagger.license name')}</swagger.license.name>
+	  <swagger.contact.email>${aib.getParam('swagger.contactEmail')}</swagger.contact.email>
+      <swagger.contact.name>${aib.getParam('swagger.contactName')}</swagger.contact.name>
+      <swagger.contact.url>${aib.getParam('swagger.contactUrl')}</swagger.contact.url>
+	  <swagger.license.url>${aib.getParam('swagger.licenseUrl')}</swagger.license.url>
+      <swagger.license.name>${aib.getParam('swagger.licenseName')}</swagger.license.name>
 	  <swagger.title>${aib.getParam('swagger.title')}</swagger.title>
       <swagger.version>${aib.getParam('swagger.version')}</swagger.version>
       <swagger.description>${aib.getParam('swagger.description')}</swagger.description>
-      <swagger.termsofservice>${aib.getParam('swagger.terms of service')}</swagger.termsofservice>
-      <swagger.outputformat>${aib.getParam('swagger.output formats')}</swagger.outputformat>
+      <swagger.termsofservice>${aib.getParam('swagger.termsOfService')}</swagger.termsofservice>
+      <swagger.outputformat>${aib.getParam('swagger.outputFormats')}</swagger.outputformat>
 #end##macro( swaggerProperties )
         
 #macro( awsLambdaDependencies )

@@ -1,25 +1,23 @@
-language: java
+#if( ${containerObject} )
+#set( $appName = "Container-${containerObject.getName()}" )
+#else
+#set( $appName = $aib.getApplicationNameFormatted() )
+#end
+#Travis_Dist_Declaration()
 
-git:
-  depth: false
-  quiet: true
+#Travis_Language_Declaration()
 
-env:
-  - DATABASE_USERNAME=root DATABASE_PASSWORD= DATABASE_DIALECT=org.hibernate.dialect.MySQL5Dialect
+#Travis_Cache_Declaration()
 
-before_install:
-- echo -e "machine github.com\n  login $GITHUB_TOKEN" > ~/.netrc
-- git lfs pull
+#Travis_Git_Declaration()
+
+#Travis_EnvVar_Declarations()
+
+#Travis_Before_Install()
+
+#Travis_Install()
+
+#Travis_Script()
+
+#Travis_Services()
   
-script:
-#if ( ${aib.getParam('nexus.inUse')} == "true" )
-#set( $nexusUserName = ${aib.getParam('nexus.userName')} )
-#set( $nexusPassword = ${aib.getParam('nexus.password')} )
-#set( $nexusRepoUrl = ${aib.getParam('nexus.repoUrl')} )
-- bundle exec mvn deploy --settings settings.xml -Dinternal.repo.username=${nexusUserName} -Dinternal.repo.password=${nexusPassword} -Dinternal.repo.url=${nexusRepoUrl}
-#else        
-- bundle exec mvn package 
-#end    
-  
-services:
-  - mysql

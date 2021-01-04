@@ -8,7 +8,7 @@
 #####################################################################
 resource "google_container_cluster" "${appName}-cluster" {
   name               = "${appName}-cluster"
-  zone               = "${esc.dollar}{var.region}"
+  location           = var.region
   initial_node_count = 3
 
   addons_config {
@@ -18,8 +18,8 @@ resource "google_container_cluster" "${appName}-cluster" {
   }
 
   master_auth {
-    username = "${esc.dollar}{var.username}"
-    password = "${esc.dollar}{var.password}"
+    username = var.username
+    password = var.password
   }
 
   node_config {
@@ -39,21 +39,21 @@ resource "google_container_cluster" "${appName}-cluster" {
 # Output for K8S
 #####################################################################
 output "client_certificate" {
-  value     = "${esc.dollar}{google_container_cluster.${appName}-cluster.master_auth.0.client_certificate}"
+  value     = google_container_cluster.${appName}-cluster.master_auth.0.client_certificate
   sensitive = true
 }
 
 output "client_key" {
-  value     = "${esc.dollar}{google_container_cluster.${appName}-cluster.master_auth.0.client_key}"
+  value     = google_container_cluster.${appName}-cluster.master_auth.0.client_key
   sensitive = true
 }
 
 output "cluster_ca_certificate" {
-  value     = "${esc.dollar}{google_container_cluster.${appName}-cluster.master_auth.0.cluster_ca_certificate}"
+  value     = google_container_cluster.${appName}-cluster.master_auth.0.cluster_ca_certificate
   sensitive = true
 }
 
 output "host" {
-  value     = "${esc.dollar}{google_container_cluster.${appName}-cluster.endpoint}"
+  value     = google_container_cluster.${appName}-cluster.endpoint
   sensitive = true
 }

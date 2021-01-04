@@ -11,10 +11,13 @@ import {${classObject.getName()}} from '../models/${classObject.getName()}';
 #foreach( $type in $classObject.getAssociationTypes( $className ) )
 import {${type}Service} from '../services/${type}.service';
 #end
-import { BaseService } from './base.service';
+import { HelperBaseService } from './helperbase.service';
 
-@Injectable()
-export class ${className}Service extends BaseService {
+@Injectable({
+	providedIn: 'root'
+  })
+    
+export class ${className}Service extends HelperBaseService {
 
 	//********************************************************************
 	// general holder 
@@ -87,7 +90,11 @@ export class ${className}Service extends BaseService {
 	// returns a Promise
 	// delegates via URI to an ORM handler
 	//********************************************************************
+#if ( $argsAsString == $null || $argsAsString == "" )
+    update${className}(id)  : Promise<any>  {
+#else
 	update${className}(${argsAsString}, id)  : Promise<any>  {
+#end##if ( ${argAsString}.length() > 0 )
     	const uri = this.ormUrl + '/${className}/update/' + id;
     	const obj = {
 #attributeStructDecl(${classObject})
@@ -119,16 +126,16 @@ export class ${className}Service extends BaseService {
 	// returns a Promise
 	// delegates via URI to an ORM handler
 	//********************************************************************
-	assign${roleName}( ${lowercaseClassName}Id, ${lowercaseRoleName}Id ): Promise<any> {
+	assign${roleName}( ${lowercaseClassName}Id, _${lowercaseRoleName}Id ): Promise<any> {
 
 		// get the ${className} from storage
 		this.loadHelper( ${lowercaseClassName}Id );
 		
 		// get the ${childName} from storage
-		var $lowercaseChildName 	= new ${childName}Service(this.http).edit${childName}(${lowercaseRoleName}Id);
+		var tmp 	= new ${childName}Service(this.http).edit${childName}(_${lowercaseRoleName}Id);
 		
 		// assign the $roleName		
-		this.${lowercaseClassName}.$lowercaseRoleName = $lowercaseChildName;
+		this.${lowercaseClassName}.$lowercaseRoleName = tmp;
       		
 		// save the ${className}
 		return this.saveHelper();		

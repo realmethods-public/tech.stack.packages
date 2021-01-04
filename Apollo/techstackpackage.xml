@@ -4,9 +4,9 @@
 	description="Apollo GraphQL server Warning: Not Yet Released" 
 	icon-url="./img/apollo-logo.png" 	
 	info-page-url="http://www.realmethods.com/infopages/apollo-info-page.html"
-    version="0.5"
+    version="1.0"
     app-type="other"
-    release-status="beta">
+    release-status="production">
 	<target-languages>
 		<target-language name="javascript"/>
 	</target-languages><!-- target language(s) supported by the template structure -->

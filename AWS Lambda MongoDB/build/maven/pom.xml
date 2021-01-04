@@ -238,7 +238,7 @@
           <publish>${lambda.publish}</publish>
           <forceUpdate>${lambda.forceUpdate}</forceUpdate>
           <environmentVariables>
-            <mongoDbServerAddresses>${aib.getParam('mongodb.server addresses')}</mongoDbServerAddresses>
+            <mongoDbServerAddresses>${aib.getParam('mongodb.serverAddresses')}</mongoDbServerAddresses>
 #if ( $aib.getParam('mongodb.credentials').length() > 0 )
             <mongoDbCredentials>${aib.getParam('mongodb.credentials')}</mongoDbCredentials>     
 #end      

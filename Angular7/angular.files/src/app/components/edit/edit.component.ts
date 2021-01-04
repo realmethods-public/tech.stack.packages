@@ -40,7 +40,11 @@ export class Edit${className}Component extends SubBaseComponent implements OnIni
 #set( $argsAsString = ${classObject.getAttributesAsString( ${includePrimaryKeys}, ${includeType}, ${includeAssociations}, ${delim}, ${suffix} )} )        	
   update${className}(${argsAsString}) {
     this.route.params.subscribe(params => {
+#if ( $argsAsString == $null || $argsAsString == "" )
+    	this.service.update${className}(params['id'])
+#else
     	this.service.update${className}(${argsAsString}, params['id'])
+#end##if ( $argsAsString == $null || $argsAsString == "" )
       		.then(success => this.router.navigate(['/index${className}']) );
   });
 }

@@ -8,11 +8,11 @@ node {
                                               -e 'DATABASE_DIALECT=org.hibernate.dialect.MySQL5Dialect' \
                                               -e 'DATABASE_URL=jdbc:mysql://db:3306/jenkinstest?createDatabaseIfNotExist=true'") {
             try {
-#if ( ${aib.getParam('nexus.inUse')} == "true" )
-#set( $nexusUserName = ${aib.getParam('nexus.userName')} )
-#set( $nexusPassword = ${aib.getParam('nexus.password')} )
-#set( $nexusRepoUrl = ${aib.getParam('nexus.repoUrl')} )
-                sh 'mvn deploy --settings settings.xml -Dinternal.repo.username=${nexusUserName} -Dinternal.repo.password=${nexusPassword} -Dinternal.repo.url=${nexusRepoUrl}'
+#if ( ${aib.getParam('artifact-repo.inUse')} == "true" )
+#set( $repoUserName = ${aib.getParam('artifact-repo.userName')} )
+#set( $repoPassword = ${aib.getParam('artifact-repo.password')} )
+#set( $repoRepoUrl = ${aib.getParam('artifact-repo.repoUrl')} )
+                sh 'mvn deploy --settings settings.xml -Dinternal.repo.username=${repoUserName} -Dinternal.repo.password=${repoPassword} -Dinternal.repo.url=${repoRepoUrl}'
 #else        
                 sh 'mvn package'
 #end    

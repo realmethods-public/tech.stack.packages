@@ -5,15 +5,13 @@
 #end
 #set( $gitTag = ${aib.getParam("git.tag")} )
 #!/bin/bash
-
-echo reset
-git reset
+cd $1
 
 git config --global user.email "dev@realmethods.com"
 git config --global user.name "Scrum Master"
  
 echo init the repository
-git init
+git init .
 
 echo add all files from root dir below, with ignore dirs and files in the .gitignore
 git add .

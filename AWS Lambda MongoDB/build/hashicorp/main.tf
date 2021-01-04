@@ -27,7 +27,7 @@ resource "aws_vpc" "default" {
 # Our default security group to for the database
 resource "aws_security_group" "mongo" {
   description = "security group created from terraform"
-  vpc_id      = "vpc-c422e2a0"
+  vpc_id      = "vpc-c422e2a0" # only valid for us-east-1
 
   # SSH access from anywhere
   ingress {
@@ -67,8 +67,7 @@ resource "aws_instance" "mongodb" {
   
   tags = { Name = "mongodb instance" } 
 
-  # standard realmethods community image with mongo started on the default port 
-  ami = "ami-0e2a167cf2e0ce6c0"
+#outputMongoDBCommunityAMIDecl()
 
   # The name of the SSH keypair you've created and downloaded
   # from the AWS console.

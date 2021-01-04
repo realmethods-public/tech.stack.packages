@@ -1,30 +1,8 @@
-image: maven:3.3.9
-pipelines:
-  default:
-  - step:
-      script:
-          - export DATABASE_USERNAME=root
-          - export DATABASE_PASSWORD=letmein2
-          - export DATABASE_DIALECT=org.hibernate.dialect.MySQL5Dialect
-          - export DATABASE_DRIVER=com.mysql.cj.jdbc.Driver
-          - export DATABASE_URL=jdbc:mysql://localhost:3306/bitbuckettest?createDatabaseIfNotExist=true
-#if ( ${aib.getParam('nexus.inUse')} == "true" )
-#set( $nexusUserName = ${aib.getParam('nexus.userName')} )
-#set( $nexusPassword = ${aib.getParam('nexus.password')} )
-#set( $nexusRepoUrl = ${aib.getParam('nexus.repoUrl')} )
-          - mvn deploy --settings settings.xml -Dinternal.repo.username=${nexusUserName} -Dinternal.repo.password=${nexusPassword} -Dinternal.repo.url=${nexusRepoUrl}
-#else        
-          - mvn package
-#end    
-      caches:
-          - maven
-      services:
-          - mysql
-          
-definitions:
-  services:
-    mysql:
-      image: mysql:5.7
-      variables: # for mysql
-        MYSQL_USER: 'root'
-        MYSQL_ROOT_PASSWORD: 'letmein2'
+#if( ${containerObject} )
+#set( $appName = "Container-${containerObject.getName()}" )
+#else
+#set( $appName = $aib.getApplicationNameFormatted() )
+#end
+#Bitbucket_Pipeline_Image_Declaration()
+#Bitbucket_Pipeline_Pipelines()
+#Bitbucket_Pipeline_Definitions() 

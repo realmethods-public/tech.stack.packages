@@ -3,33 +3,11 @@
 #else
 #set( $appName = $aib.getApplicationNameFormatted() )
 #end
-#### CI CONFIG
+#Shippable_Language_Declaration()
 
-language: java
-
-jdk:
-  - oraclejdk8
-
-#### force usage of MySQL for the purpose of testing with mvn test  
-env:
-  - DATABASE_USERNAME=shippable DATABASE_PASSWORD= DATABASE_DIALECT=org.hibernate.dialect.MySQL8Dialect DATABASE_DRIVER=com.mysql.cj.jdbc.Driver
+#Shippable_EnvVar_Declarations()
 
 build:
-  cache: true
-  ci:
-    - mysql -e "CREATE USER shippable@localhost IDENTIFIED BY ''; GRANT ALL ON *.* TO shippable@localhost; FLUSH PRIVILEGES;"
-#if ( ${aib.getParam('nexus.inUse')} == "true" )
-#set( $nexusUserName = ${aib.getParam('nexus.userName')} )
-#set( $nexusPassword = ${aib.getParam('nexus.password')} )
-#set( $nexusRepoUrl = ${aib.getParam('nexus.mavenRepoUrl')} )
-    - mvn deploy --settings settings.xml -Dinternal.repo.username=${nexusUserName} -Dinternal.repo.password=${nexusPassword} -Dinternal.repo.url=${nexusRepoUrl}
-#else        
-    - mvn test
-#end    
-    - mkdir -p shippable/testresults
-    - find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} shippable/testresults/ \;
-
-services:
-  - mysql    
-      
-#### END CI CONFIG
+#Shippable_Cache()
+#Shippable_CI()
+#Shippable_Services()

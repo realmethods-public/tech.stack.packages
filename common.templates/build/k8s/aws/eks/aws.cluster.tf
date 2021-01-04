@@ -11,9 +11,13 @@ data "aws_eks_cluster" "${appName}-cluster" {
 }
 
 output "endpoint" {
-  value = "${data.aws_eks_cluster.${appName}-cluster.endpoint}"
+  value = "${esc.dollar}{data.aws_eks_cluster.${appName}-cluster.endpoint}"
 }
 
 output "kubeconfig-certificate-authority-data" {
-  value = "${data.aws_eks_cluster.${appName}-cluster.certificate_authority.0.data}"
+  value = "${esc.dollar}{data.aws_eks_cluster.${appName}-cluster.certificate_authority.0.data}"
 }
+
+#####################################################################
+# Output for K8S
+#####################################################################

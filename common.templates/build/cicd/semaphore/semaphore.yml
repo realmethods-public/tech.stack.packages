@@ -1,36 +1,12 @@
 version: v1.0
 name: Standard Java Build-Test Pipeline
 agent:
-  machine:
-    type: e1-standard-2
-    os_image: ubuntu1804
+#Semaphore_Machine_Declaration()
     
 blocks:
-  - name: Build-Test using Maven and JUnit5
+#Semaphore_Block_Name()
     task:
-      env_vars:
-        - name: DATABASE_USERNAME
-          value: "root"
-        - name: DATABASE_PASSWORD
-          value: ""
-        - name: DATABASE_DIALECT
-          value: "org.hibernate.dialect.MySQL8Dialect"
-        - name: DATABASE_DRIVER
-          value: "com.mysql.cj.jdbc.Driver"
-      jobs:
-        - name: Running test using Junit
-          commands:
-            - cache restore maven-$SEMAPHORE_GIT_BRANCH-$(checksum pom.xml)      
-            - sem-service start mysql 8
-            - sudo apt-get install -y -qq mysql-client
-            - sem-service status mysql          
-            - checkout
-#if ( ${aib.getParam('nexus.inUse')} == "true" )
-#set( $nexusUserName = ${aib.getParam('nexus.userName')} )
-#set( $nexusPassword = ${aib.getParam('nexus.password')} )
-#set( $nexusRepoUrl = ${aib.getParam('nexus.repoUrl')} )
-            - mvn deploy --settings settings.xml -Dinternal.repo.username=${nexusUserName} -Dinternal.repo.password=${nexusPassword} -Dinternal.repo.url=${nexusRepoUrl}
-#else        
-            - mvn dependency:go-offline test
-#end    
-            - cache store maven-$SEMAPHORE_GIT_BRANCH-$(checksum pom.xml) ~/.m2
+#Semaphore_Env_Vars()
+#Semaphore_Prologue()
+#Semaphore_Jobs()
+#Semaphore_Epilogue()

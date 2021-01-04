@@ -63,7 +63,9 @@
 #set( $classesToUse = $aib.getClassesWithIdentity() )
 #end	
 #foreach( $class in $classesToUse )
+#if( $class.isNotEmpty() == true )
 		content = content + '<li id="${class.getName()}"><font style="font-size:0.8em;">${class.getName()}</font></li>';
+#end##if( $class.isNotEmpty() == true )
 #end ##foreach( $class in $classesToUse )
 
 		content = content + '</ul>';

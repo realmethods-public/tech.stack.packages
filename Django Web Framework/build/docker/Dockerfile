@@ -3,29 +3,38 @@
 #else
 #set( $appName = $aib.getApplicationNameFormatted() )
 #end
-FROM python:3
-# Install Python and Package Libraries
-RUN apt-get update && apt-get upgrade -y && apt-get autoremove && apt-get autoclean
-RUN apt-get install -y \
-    curl \
-    wget \
-    net-tools \
-    dos2unix \
-    nano
+#Codeship_From_Image()
+
+#############################################################################
+# Install dependencies
+#############################################################################
+RUN apt-get update --fix-missing && \
+apt-get install -y dos2unix
+
+#############################################################################
+# copy all files to a working directory
+#############################################################################
 # Project Files and Settings
 ARG PROJECT=${appName}
-ARG PROJECT_DIR=/var/www/${appName}
+ARG PROJECT_DIR=/var/www/${PROJECT}
 RUN mkdir -p $PROJECT_DIR
-ADD ./ $PROJECT_DIR/
-RUN cd $PROJECT_DIR && ls
+COPY . /var/www/
 WORKDIR $PROJECT_DIR
+
 RUN pip install --upgrade pip
-RUN pip install -U pipenv
-RUN pipenv install
-RUN pipenv install django=='2.2.*'
-# Server
-EXPOSE 8000
+RUN pip install django=='2.2.*'
+
+#############################################################################
+# install upgrade pip and Django 2.2
+#############################################################################
+RUN pip install --upgrade pip
+RUN pip install django=='2.2.*'
+
+#############################################################################
+# Server Directives
+#############################################################################
+EXPOSE 8080
 STOPSIGNAL SIGINT
-RUN dos2unix /var/www/${appName}/entrypoint.sh
-RUN chmod +x /var/www/${appName}/entrypoint.sh
-ENTRYPOINT ["/var/www/${appName}/entrypoint.sh"]
+RUN dos2unix /var/www/entrypoint.sh
+RUN chmod +x /var/www/entrypoint.sh
+ENTRYPOINT ["/var/www/entrypoint.sh"]

@@ -1,43 +1,24 @@
+#if( ${containerObject} )
+#set( $appName = "Container-${containerObject.getName()}" )
+#else
+#set( $appName = $aib.getApplicationNameFormatted() )
+#end
 version: 0.2
-
 env:
   variables:
-    JAVA_HOME: "/usr/lib/jvm/java-8-openjdk-amd64"
-    DATABASE_USERNAME: "root"
-    DATABASE_PASSWORD: ""
-    DATABASE_DIALECT: "org.hibernate.dialect.MySQL5Dialect"
+#AWS_CodeBuild_EnvVarsDeclaration()
 
 phases:
   install:
-    commands:
-      - echo Entered the install phase...
-      - apt-get update -y
-      - echo Installing Apache Maven...      
-      - apt-get install -y maven
-      - echo Installing MySQL...      
-      - apt-get install -y mysql-server
-      - su mysql -s /bin/bash -c "/usr/sbin/mysqld" &
-      - su mysql "CREATE USER root@localhost IDENTIFIED BY ''; GRANT ALL ON *.* TO root@localhost; FLUSH PRIVILEGES;" &
-    finally:
-      - echo Install phase complete...
+#AWS_CodeBuild_Runtime_Versions()    
+#AWS_CodeBuild_Install_Phase_Commands()
   build:
+#AWS_CodeBuild_Build_Phase_Commands()
+  post_build:
     commands:
-#if ( ${aib.getParam('nexus.inUse')} == "true" )
-#set( $nexusUserName = ${aib.getParam('nexus.userName')} )
-#set( $nexusPassword = ${aib.getParam('nexus.password')} )
-#set( $nexusRepoUrl = ${aib.getParam('nexus.repoUrl')} )
-      - echo Entered the build/test/package/deploy phase...
-      - mvn deploy --settings settings.xml -Dinternal.repo.username=${nexusUserName} -Dinternal.repo.password=${nexusPassword} -Dinternal.repo.url=${nexusRepoUrl}
-#else        
-      - echo Entered the build/test/package phase...
-      - mvn package
-#end    
-    finally:
-      - echo Build phase complete
+#AWS_DockerImageDeclaration()
+
+#AWS_TerraformJobDefinition()
+
 artifacts:
-  files:
-    - target/*jar
-  discard-paths: yes
-  cache:
-    paths:
-      - '/root/.m2/**/*'
+#AWS_CodeBuild_Artifacts()

@@ -132,7 +132,7 @@ resource "aws_instance" "web" {
 
 #set( $dockerUserName = ${aib.getParam("docker.userName")} ) 
 #set( $dockerPassword = ${aib.getParam("docker.password")} )
-#set( $dockerOrgName = ${aib.getParam("dockerorg-name")} )
+#set( $dockerOrgName = ${aib.getParam("docker.orgName")} )
 #set( $dockerRepo = ${aib.getParam("docker.repo")} )
 #set( $dockerTag = ${aib.getParam("docker.tag")} )
 #set( $databaseUrl = "jdbc:${dbEngine}://${esc.dollar}{aws_db_instance.default.endpoint}/${appName}" )
@@ -194,3 +194,10 @@ output "ssh_command" {
 }
 #end ##macro ( outputSSHCommandDecl )
 
+########################################################################
+## declare default realmethods community MongoDB AMI
+########################################################################
+#macro ( outputMongoDBCommunityAMIDecl )
+  # standard realmethods community Amazon Machine Image using MongoDB started on the default port 
+  ami = "ami-028195c392f258827"
+#end ##macro ( outputMongoDBCommunityAMIDecl )

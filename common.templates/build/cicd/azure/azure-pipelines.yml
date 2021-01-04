@@ -1,32 +1,9 @@
-pool:
-  vmImage: 'ubuntu-16.04'
-
-variables: # pipeline-level
-  DATABASE_USERNAME: 'root'
-  DATABASE_PASSWORD: 'letmein2'
-  DATABASE_DIALECT: 'org.hibernate.dialect.MySQL8Dialect'
-  DATABASE_DRIVER: 'com.mysql.cj.jdbc.Driver'
-  DATABASE_URL: 'jdbc:mysql://172.17.0.2:3306/azuretest?createDatabaseIfNotExist=true'
-
-steps:
-- script: docker run -d --name=rm-test-mysql -e MYSQL_ROOT_PASSWORD=letmein2 mysql
-  displayName: 'installing latest mysql docker image'
-#if ( ${aib.getParam('nexus.inUse')} == "true" )
-#set( $nexusUserName = ${aib.getParam('nexus.userName')} )
-#set( $nexusPassword = ${aib.getParam('nexus.password')} )
-#set( $nexusRepoUrl = ${aib.getParam('nexus.repoUrl')} )
-#set( $mavenGoals = "deploy" )
-#set( $mavenOptions = "--settings settings.xml -Dinternal.repo.username=${nexusUserName} -Dinternal.repo.password=${nexusPassword} -Dinternal.repo.url=${nexusRepoUrl}" )
+#if( ${containerObject} )
+#set( $appName = "Container-${containerObject.getName()}" )
 #else
-#set( $mavenOptions = "" )
-#set( $mavenGoals = "package" )
-#end    
-- task: Maven@3
-  inputs:
-    mavenPomFile: 'pom.xml'
-    mavenOptions: '${mavenOptions}'
-    jdkVersionOption: '1.8'
-    jdkArchitectureOption: 'x64'
-    publishJUnitResults: yes
-    testResultsFiles: '**/TEST-*.xml'
-    goals: '${mavenGoals}'
+#set( $appName = $aib.getApplicationNameFormatted() )
+#end
+#Azure_Pipeline_Pool_Declaration()
+#Azure_Pipeline_Var_Declarations()
+#Azure_Pipeline_Steps()
+  displayName: 'build the entire application'
