@@ -199,5 +199,5 @@ output "ssh_command" {
 ########################################################################
 #macro ( outputMongoDBCommunityAMIDecl )
   # standard realmethods community Amazon Machine Image using MongoDB started on the default port 
-  ami = "ami-028195c392f258827"
+  ami = "ami-05df3d475fe54e496"
 #end ##macro ( outputMongoDBCommunityAMIDecl )

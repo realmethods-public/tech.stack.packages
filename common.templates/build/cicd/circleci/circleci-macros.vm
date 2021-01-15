@@ -31,7 +31,7 @@ save_repo: &save_repo
 #macro( CircleCI_DockerImageDeclaration )
 #set( $dockerUserName = ${aib.getParam("docker.username")} ) 
 #set( $dockerPassword = ${aib.getParam("docker.password")} )
-#set( $dockerOrgName = ${aib.getParam("docker.org-name")} )
+#set( $dockerOrgName = ${aib.getParam("docker.orgName")} )
 #set( $dockerRepo = ${aib.getParam("docker.repo")} )
 #set( $dockerTag = ${aib.getParam("docker.tag")} )
   docker_build:
@@ -83,13 +83,21 @@ save_repo: &save_repo
 #end##macro( CircleCI_BuiltTestProjectDeclaration )
 
 ########################################################################
+## dockerjob declaration macro
+########################################################################
+#macro( CircleCI_DockerJobDeclaration )
+#if( ${aib.getParam("docker.inUse")} == "true" )
+      - docker_build:
+          requires:
+            - build_test_project
+#end
+#end##macro( terraformJobDeclaration )
+
+########################################################################
 ## terraform job declaration macro
 ########################################################################
 #macro( CircleCI_TerraformJobDeclaration )
 #if( ${aib.getParam("terraform.inUse")} == "true" )
-      - docker_build:
-          requires:
-            - build_test_project
       - terraform:
           requires:
             - docker_build
@@ -127,6 +135,7 @@ terraform_init: &terraform_init
 ## Terraform job definition
 ########################################################################
 #macro( CircleCI_TerraformJobDefinition )
+#if( ${aib.getParam("terraform.inUse")} == "true" )
 #set( $fingerprint = ${aib.getParam("cicd.ssh-fingerprint")} )
   terraform:
     <<: *terraform_config
@@ -142,6 +151,7 @@ terraform_init: &terraform_init
             cd /home/circleci/gitRoot/terraform
             terraform plan -out=terraform.plan -var aws-access-key=$USER_AWS_ACCESSKEY -var aws-secret-key=$USER_AWS_SECRETKEY
             terraform apply -auto-approve "terraform.plan"
+#end##if( ${aib.getParam("terraform.inUse")} == "true" )            
 #end##macro( CircleCI_TerraformJobDefinition )
 
 ########################################################################
@@ -154,6 +164,7 @@ workflows:
   build_test_deploy_workflow:
     jobs:
       - build_test_project
+#CircleCI_DockerJobDeclaration()
 #CircleCI_TerraformJobDeclaration()
 #end##macro( CircleCI_WorkflowsDeclaration )
 
